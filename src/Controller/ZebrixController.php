@@ -23,7 +23,8 @@ class ZebrixController extends ControllerBase {
   }
 
   public function show() {
-    return ['#markup' => $this->upcomingEvents->getUpcomingEvents()];
+    $this->upcomingEvents->printUpcomingEvents();
+    exit;
   }
 
 }
