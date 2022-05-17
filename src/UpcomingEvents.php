@@ -138,7 +138,7 @@ class UpcomingEvents {
       FROM
         civicrm_event a
       LEFT JOIN
-        civicrm_value_evenet_doelpgroep d ON a.id = d.entity_id
+        civicrm_value_extra_evenement_info d ON a.id = d.entity_id
       LEFT JOIN
         civicrm_option_value c ON event_type_id = c.value
       WHERE
@@ -165,6 +165,7 @@ class UpcomingEvents {
         0,10
     ";
 
+    \Drupal::service('civicrm')->initialize();
     return \CRM_Core_DAO::executeQuery($sql);
   }
 
