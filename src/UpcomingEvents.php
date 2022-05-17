@@ -160,7 +160,7 @@ class UpcomingEvents {
       AND
         event_type_id IN (11,24,25,30,26,27,28,31,29,36,44,33,32,9,35,6,20,49,50)
       ORDER BY
-        start_date, Startuur
+        start_date, Startuur, title
       LIMIT
         0,10
     ";
