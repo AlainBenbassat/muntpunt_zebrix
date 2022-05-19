@@ -121,7 +121,7 @@ class UpcomingEvents {
     return $days[$day];
   }
 
-  private function getEvents() {
+  private function getEvents($eventTypeList) {
     $sql = "
       SELECT
         title,
@@ -158,7 +158,7 @@ class UpcomingEvents {
       AND
         c.option_group_id = 15
       AND
-        event_type_id IN (11,24,25,30,26,27,28,31,29,36,44,33,32,9,35,6,20,49,50)
+        event_type_id IN ($eventTypeList)
       ORDER BY
         start_date, Startuur, title
       LIMIT
