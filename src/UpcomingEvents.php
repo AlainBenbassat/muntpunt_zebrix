@@ -24,7 +24,7 @@ class UpcomingEvents {
           <meta http-equiv="X-UA-Compatible" content="ie=edge">
           <meta http-equiv="refresh" content="300" >
           <title>Muntpunt evenementen</title>
-          <link rel="stylesheet" href="css/style.css">
+          <link rel="stylesheet" href="modules/custom/muntpunt_zebrix/css/style.css">
         </head>
         <body>
     ';
