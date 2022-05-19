@@ -1,14 +1,14 @@
 
 @font-face {
   font-family: FlandersArtSans-Regular;
-  src: url('../Fonts/FlandersArtSans-Regular.otf');
-  src: url('../Fonts/FlandersArtSans-Regular.otf') format('opentype');
+  src: url('Fonts/FlandersArtSans-Regular.otf');
+  src: url('Fonts/FlandersArtSans-Regular.otf') format('opentype');
 }
 
 @font-face {
   font-family: FlandersArtSans-Medium;
-  src: url('../Fonts/FlandersArtSans-Medium.otf');
-  src: url('../Fonts/FlandersArtSans-Medium.otf') format('opentype');
+  src: url('Fonts/FlandersArtSans-Medium.otf');
+  src: url('Fonts/FlandersArtSans-Medium.otf') format('opentype');
 }
 
 body{
