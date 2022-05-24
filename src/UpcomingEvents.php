@@ -7,6 +7,7 @@ class UpcomingEvents {
   private const EVENT_TYPE_TE_GAST = '39,48';
   private const WHOLE_DAY = 1;
   private const FROM_NOW = 2;
+  private const MAX_NUM_EVENTS = 10;
 
   private $daoEvents;
   private $daoTeGast;
@@ -25,7 +26,7 @@ class UpcomingEvents {
     $this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::WHOLE_DAY);
     $this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::WHOLE_DAY);
 
-    if ($this->daoEvents->N + $this->daoTeGast->N >= 10) {
+    if ($this->daoEvents->N + $this->daoTeGast->N >= self::MAX_NUM_EVENTS) {
       $this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW);
       $this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW);
     }
@@ -148,9 +149,9 @@ class UpcomingEvents {
   private function getWhereClauseEventsStillRunning() {
     $sqlWhere = "
       (
-        DATE_FORMAT(start_date,'%Y %m %d') <= DATE_FORMAT(now(),'%Y %m %d')
+        DATE_FORMAT(start_date,'%Y %m %d') < DATE_FORMAT(now(),'%Y %m %d')
       AND
-        DATE_FORMAT(end_date,'%Y %m %d') >= DATE_FORMAT(now(),'%Y %m %d')
+        DATE_FORMAT(end_date,'%Y %m %d') > DATE_FORMAT(now(),'%Y %m %d')
       )
     ";
 
