@@ -5,13 +5,30 @@ namespace Drupal\muntpunt_zebrix;
 class UpcomingEvents {
   private const EVENT_TYPE_NORMAL = '11,24,25,30,26,27,28,31,29,36,44,33,32,9,35,6,20,49,50';
   private const EVENT_TYPE_TE_GAST = '39,48';
+  private const WHOLE_DAY = 1;
+  private const FROM_NOW = 2;
+
+  private $daoEvents;
+  private $daoTeGast;
 
   public function printUpcomingEvents() {
+    $this->fillDao();
+
     $this->printHtmlHeader();
     $this->printTodaysDate();
     $this->printEvents();
     $this->printEventsTeGast();
     $this->printHtmlFooter();
+  }
+
+  private function fillDao() {
+    $this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::WHOLE_DAY);
+    $this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::WHOLE_DAY);
+
+    if ($this->daoEvents->N + $this->daoTeGast->N >= 10) {
+      $this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW);
+      $this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW);
+    }
   }
 
   private function printHtmlHeader() {
@@ -39,35 +56,31 @@ class UpcomingEvents {
   }
 
   private function printEvents() {
-    $dao = $this->getEvents(self::EVENT_TYPE_NORMAL);
-
-    while ($dao->fetch()) {
-      echo '<p><span style="font-size: 40px;">' . $dao->title . '</span><br><span style="font-size: 32px;">';
+    while ($this->daoEvents->fetch()) {
+      echo '<p><span style="font-size: 40px;">' . $this->daoEvents->title . '</span><br><span style="font-size: 32px;">';
       $today = date('Y-m-d');
-      $einddatum = $dao->Einddatum;
+      $einddatum = $this->daoEvents->Einddatum;
       if ($einddatum !== $today) {
         echo 'DOORLOPEND';
       }
       else {
-        echo $dao->Startuur . ' -  ' . $dao->Einduur;
+        echo $this->daoEvents->Startuur . ' -  ' . $this->daoEvents->Einduur;
       }
 
-      echo ' / ' . strtoupper(preg_replace("/\x01/",", ",substr($dao->Zaal,1,-1))) . '</span></p>';
+      echo ' / ' . strtoupper(preg_replace("/\x01/",", ",substr($this->daoEvents->Zaal,1,-1))) . '</span></p>';
       echo '<hr >';
     }
   }
 
   private function printEventsTeGast() {
-    $dao = $this->getEvents(self::EVENT_TYPE_TE_GAST);
-
-    if ($dao->N > 0) {
+    if ($this->daoTeGast->N > 0) {
       echo '<p  style="font-size: 60px;" class="tegast">TE GAST</p>';
 
-      while ($dao->fetch()) {
-        echo '<p><span style="font-size: 40px;">' . $dao->title . '</span><br/><span style="font-size: 32px;">';
+      while ($this->daoTeGast->fetch()) {
+        echo '<p><span style="font-size: 40px;">' . $this->daoTeGast->title . '</span><br/><span style="font-size: 32px;">';
 
-        echo $dao->Startuur . ' -  ' . $dao->Einduur;
-        echo ' / ' . strtoupper(preg_replace("/\x01/", ", ", substr($dao->Zaal, 1, -1))) . '</span></p>';
+        echo $this->daoTeGast->Startuur . ' -  ' . $this->daoTeGast->Einduur;
+        echo ' / ' . strtoupper(preg_replace("/\x01/", ", ", substr($this->daoTeGast->Zaal, 1, -1))) . '</span></p>';
         echo '<hr >';
       }
     }
@@ -121,7 +134,34 @@ class UpcomingEvents {
     return $days[$day];
   }
 
-  private function getEvents($eventTypeList) {
+  private function getWhereClauseEventsOfToday($period) {
+    if ($period == self::WHOLE_DAY) {
+      $sqlWhere = "DATE_FORMAT(now(),'%d %M %Y') = DATE_FORMAT (start_date, '%d %M %Y')";
+    }
+    else {
+      $sqlWhere = "(DATE_FORMAT(now(),'%d %M %Y') = DATE_FORMAT(start_date, '%d %M %Y') and end_date > now())";
+    }
+
+    return $sqlWhere;
+  }
+
+  private function getWhereClauseEventsStillRunning() {
+    $sqlWhere = "
+      (
+        DATE_FORMAT(start_date,'%Y %m %d') <= DATE_FORMAT(now(),'%Y %m %d')
+      AND
+        DATE_FORMAT(end_date,'%Y %m %d') >= DATE_FORMAT(now(),'%Y %m %d')
+      )
+    ";
+
+    return $sqlWhere;
+  }
+
+
+  private function getEvents($eventTypeList, $period) {
+    $eventsOfToday = $this->getWhereClauseEventsOfToday($period);
+    $eventsStillRunning = $this->getWhereClauseEventsStillRunning();
+
     $sql = "
       SELECT
         title,
@@ -143,13 +183,9 @@ class UpcomingEvents {
         civicrm_option_value c ON event_type_id = c.value
       WHERE
         (
-          DATE_FORMAT(now(),'%d %M %Y') = DATE_FORMAT (start_date, '%d %M %Y')
+          $eventsOfToday
         OR
-          (
-            DATE_FORMAT(start_date,'%Y %m %d')  <= DATE_FORMAT(now(),'%Y %m %d')
-          AND
-            DATE_FORMAT(end_date,'%Y %m %d') >= DATE_FORMAT(now(),'%Y %m %d')
-          )
+          $eventsStillRunning
         )
       AND
         d.muntpunt_zalen NOT LIKE ''
