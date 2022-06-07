@@ -7,7 +7,7 @@ class UpcomingEvents {
   private const EVENT_TYPE_TE_GAST = '39,48';
   private const WHOLE_DAY = 1;
   private const FROM_NOW = 2;
-  private const MAX_NUM_EVENTS = 10;
+  private const MAX_NUM_EVENTS = 8;
 
   private $daoEvents;
   private $daoTeGast;
