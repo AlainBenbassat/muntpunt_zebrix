@@ -199,7 +199,7 @@ class UpcomingEvents {
       ORDER BY
         start_date, Startuur, title
       LIMIT
-        0,9
+        0,8
     ";
 
     \Drupal::service('civicrm')->initialize();
