@@ -49,7 +49,11 @@ class UpcomingEvents {
   }
 
   private function printTodaysDate() {
-    echo '<p style="font-size: 54px;" class="datumvandaag">';
+    if ($_GET['view'] == "intranet"){	 	  
+	    echo '<p style="font-size: 14px;" class="datumvandaag">';
+    }else{
+	    echo '<p style="font-size: 54px;" class="datumvandaag">';
+    }
     echo $this->getDateWeekDay() . ' ';
     echo $this->getDateDay() . ' ';
     echo $this->getDateMonth();
@@ -58,7 +62,11 @@ class UpcomingEvents {
 
   private function printEvents() {
     while ($this->daoEvents->fetch()) {
-      echo '<p><span style="font-size: 40px;">' . $this->daoEvents->title . '</span><br><span style="font-size: 32px;">';
+      if ($_GET['view'] == "intranet"){
+         echo '<p style="margin: 0px";><span style="font-size: 13px;">' . $this->daoEvents->title . '</span><br><span style="font-size: 12px;">';
+      }else{
+         echo '<p><span style="font-size: 40px;">' . $this->daoEvents->title . '</span><br><span style="font-size: 32px;">';
+      }	      
       $today = date('Y-m-d');
       $einddatum = $this->daoEvents->Einddatum;
       if ($einddatum !== $today) {
@@ -74,12 +82,18 @@ class UpcomingEvents {
   }
 
   private function printEventsTeGast() {
-    if ($this->daoTeGast->N > 0) {
-      echo '<p  style="font-size: 60px;" class="tegast">TE GAST</p>';
-
+  if ($this->daoTeGast->N > 0) {
+	if ($_GET['view'] == "intranet"){	    
+		echo '<p  style="font-size: 15px;" class="tegast">TE GAST</p>';
+	}else{
+		echo '<p  style="font-size: 60px;" class="tegast">TE GAST</p>';
+	}
       while ($this->daoTeGast->fetch()) {
-        echo '<p><span style="font-size: 40px;">' . $this->daoTeGast->title . '</span><br/><span style="font-size: 32px;">';
-
+	 if ($_GET['view'] == "intranet"){
+		echo '<p style="margin:0px"><span style="font-size: 13px;">' . $this->daoTeGast->title . '</span><br/><span style="font-size: 12px;">';
+	}else{
+		echo '<p><span style="font-size: 40px;">' . $this->daoTeGast->title . '</span><br/><span style="font-size: 32px;">';
+	}
         echo $this->daoTeGast->Startuur . ' -  ' . $this->daoTeGast->Einduur;
         echo ' / ' . strtoupper(preg_replace("/\x01/", ", ", substr($this->daoTeGast->Zaal, 1, -1))) . '</span></p>';
         echo '<hr >';
