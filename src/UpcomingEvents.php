@@ -14,7 +14,6 @@ class UpcomingEvents {
 
   public function printUpcomingEvents() {
     $this->fillDao();
-
     $this->printHtmlHeader();
     $this->printTodaysDate();
     $this->printEvents();
@@ -52,20 +51,27 @@ class UpcomingEvents {
     if ($_GET['view'] == "intranet"){	 	  
 	    echo '<p style="font-size: 14px;" class="datumvandaag">';
     }else{
-	    echo '<p style="font-size: 54px;" class="datumvandaag">';
+	    echo '<p style="font-size: 90px;" class="datumvandaag">';
     }
     echo $this->getDateWeekDay() . ' ';
-    echo $this->getDateDay() . ' ';
+    echo $this->getDateDay() . '.';
     echo $this->getDateMonth();
     echo '</p>';
   }
 
   private function printEvents() {
-    while ($this->daoEvents->fetch()) {
-      if ($_GET['view'] == "intranet"){
+   echo '<table>';	  
+   while ($this->daoEvents->fetch()) {
+       if ($_GET['view'] == "intranet"){
+		   
          echo '<p style="margin: 0px";><span style="font-size: 13px;">' . $this->daoEvents->title . '</span><br><span style="font-size: 12px;">';
       }else{
-         echo '<p><span style="font-size: 40px;">' . $this->daoEvents->title . '</span><br><span style="font-size: 32px;">';
+	$title =  $this->daoEvents->title ;
+	if (strpos($title, ':') !== false) {
+    		$parts = explode(':', $title);
+    		$title =  $parts[0] . ":<br>" . $parts[1];
+	}	
+	 echo '<tr><td width="70%"><span style="font-size: 50px;line-height: 60px"; class="titelevent">' . $title . '</span></td><td><span style="font-size: 45px;line-height: 60px ">';
       }	      
       $today = date('Y-m-d');
       $einddatum = $this->daoEvents->Einddatum;
@@ -73,32 +79,36 @@ class UpcomingEvents {
         echo 'DOORLOPEND';
       }
       else {
-        echo $this->daoEvents->Startuur . ' -  ' . $this->daoEvents->Einduur;
+        echo $this->daoEvents->Startuur . ' - ' . $this->daoEvents->Einduur;
       }
-
-      echo ' / ' . strtoupper(preg_replace("/\x01/",", ",substr($this->daoEvents->Zaal,1,-1))) . '</span></p>';
-      echo '<hr >';
-    }
+      echo '<br/>' . strtoupper(preg_replace("/\x01/",", ",substr($this->daoEvents->Zaal,1,-1))) . '</span></td></tr>';
+      echo '<tr><td colspan="2"><hr ></td></tr>';
+   }
+   echo '</table>';
   }
 
   private function printEventsTeGast() {
-  if ($this->daoTeGast->N > 0) {
+     if ($this->daoTeGast->N > 0) {
+        echo '<table>';
 	if ($_GET['view'] == "intranet"){	    
 		echo '<p  style="font-size: 15px;" class="tegast">TE GAST</p>';
 	}else{
-		echo '<p  style="font-size: 60px;" class="tegast">TE GAST</p>';
+		echo '<br/><br/><br/>';
+		echo '<p  style="font-size: 65px;line-height:90px" class="tegast">Te gast</p>';
+		
 	}
       while ($this->daoTeGast->fetch()) {
 	 if ($_GET['view'] == "intranet"){
 		echo '<p style="margin:0px"><span style="font-size: 13px;">' . $this->daoTeGast->title . '</span><br/><span style="font-size: 12px;">';
 	}else{
-		echo '<p><span style="font-size: 40px;">' . $this->daoTeGast->title . '</span><br/><span style="font-size: 32px;">';
+		echo '<tr><td width="70%"><span style="font-size: 50px;line-height:60px"; class="titelevent">' . $this->daoTeGast->title . '</span></td><td><span style="font-size: 45px;line-height: 60px">';
 	}
         echo $this->daoTeGast->Startuur . ' -  ' . $this->daoTeGast->Einduur;
-        echo ' / ' . strtoupper(preg_replace("/\x01/", ", ", substr($this->daoTeGast->Zaal, 1, -1))) . '</span></p>';
-        echo '<hr >';
+        echo ' <br/> ' . strtoupper(preg_replace("/\x01/", ", ", substr($this->daoTeGast->Zaal, 1, -1))) . '</span></td></tr>';
+        echo '<tr><td colspan="2"><hr ></td></tr>';
       }
-    }
+     }
+     echo '</table>';
   }
 
   private function printHtmlFooter() {
@@ -109,39 +119,22 @@ class UpcomingEvents {
   }
 
   private function getDateDay() {
-    return date('j');
+    return date('d');
   }
 
   private function getDateMonth() {
-    $months = [
-      'January' => 'JANUARI',
-      'February' => 'FEBRUARI',
-      'March' => 'MAART',
-      'April' => 'APRIL',
-      'May' => 'MEI',
-      'June' => 'JUNI',
-      'July' => 'JULI',
-      'August' => 'AUGUSTUS',
-      'September' => 'SEPTEMBER',
-      'October' => 'OKTOBER',
-      'November' => 'NOVEMBER',
-      'December' => 'DECEMBER'
-    ];
-
-    $month = date('F');
-
-    return $months[$month];
+    return date('m');
   }
 
   private function getDateWeekDay() {
     $days = [
-      'Monday' => 'MAANDAG',
-      'Tuesday' => 'DINSDAG',
-      'Wednesday' => 'WOENSDAG',
-      'Thursday' => 'DONDERDAG',
-      'Friday' => 'VRIJDAG',
-      'Saturday' => 'ZATERDAG',
-      'Sunday' => 'ZONDAG'
+      'Monday' => 'maandag',
+      'Tuesday' => 'dinsdag',
+      'Wednesday' => 'woensdag',
+      'Thursday' => 'donderdag',
+      'Friday' => 'vrijdag',
+      'Saturday' => 'zaterdag',
+      'Sunday' => 'zondag'
     ];
 
     $day = date('l');
