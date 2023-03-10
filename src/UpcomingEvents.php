@@ -144,7 +144,7 @@ class UpcomingEvents {
 
   private function getWhereClauseEventsOfToday($period) {
     if ($period == self::WHOLE_DAY) {
-      $sqlWhere = "DATE_FORMAT(now(),'%d %M %Y') = DATE_FORMAT (start_date, '%d %M %Y')";
+      $sqlWhere = "DATE_FORMAT(now(),'%d %M %Y') = DATE_FORMAT(start_date, '%d %M %Y')";
     }
     else {
       $sqlWhere = "(DATE_FORMAT(now(),'%d %M %Y') = DATE_FORMAT(start_date, '%d %M %Y') and end_date > now())";
